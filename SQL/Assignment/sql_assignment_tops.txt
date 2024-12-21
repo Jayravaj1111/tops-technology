@@ -1,0 +1,97 @@
+-- 1) Statement to create the Contact table
+CREATE TABLE Contact (
+    ContactID INT PRIMARY KEY,
+    CompanyID INT,
+    FirstName VARCHAR(45),
+    LastName VARCHAR(45),
+    Street VARCHAR(45),
+    City VARCHAR(45),
+    State VARCHAR(2),
+    Zip VARCHAR(10),
+    IsMain BOOLEAN,
+    Email VARCHAR(45),
+    Phone VARCHAR(12),
+    FOREIGN KEY (CompanyID) REFERENCES Company(CompanyID)
+);
+
+-- 2) Statement to create the Employee table
+CREATE TABLE Employee (
+    EmployeeID INT PRIMARY KEY,
+    FirstName VARCHAR(45),
+    LastName VARCHAR(45),
+    Salary DECIMAL(10,2),
+    HireDate DATE,
+    JobTitle VARCHAR(25),
+    Email VARCHAR(45),
+    Phone VARCHAR(12)
+);
+
+-- 3) Statement to create the ContactEmployee table
+CREATE TABLE ContactEmployee (
+    ContactEmployeeID INT PRIMARY KEY,
+    ContactID INT,
+    EmployeeID INT,
+    ContactDate DATE,
+    Description VARCHAR(100),
+    FOREIGN KEY (ContactID) REFERENCES Contact(ContactID),
+    FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID)
+);
+
+-- 4) Update Lesley Bland’s phone number to 215-555-8800
+UPDATE Employee
+SET Phone = '215-555-8800'
+WHERE FirstName = 'Lesley' AND LastName = 'Bland';
+
+-- 5) Update Company name Urban Outfitters, Inc. to Urban Outfitters
+UPDATE Company
+SET CompanyName = 'Urban Outfitters'
+WHERE CompanyName = 'Urban Outfitters, Inc.';
+
+-- 6) Remove Dianne Connor’s contact event with Jack Lee
+DELETE FROM ContactEmployee
+WHERE ContactEmployeeID = (SELECT ce.ContactEmployeeID
+                           FROM ContactEmployee ce
+                           JOIN Contact c ON ce.ContactID = c.ContactID
+                           JOIN Employee e ON ce.EmployeeID = e.EmployeeID
+                           WHERE c.FirstName = 'Dianne' AND c.LastName = 'Connor'
+                           AND e.FirstName = 'Jack' AND e.LastName = 'Lee');
+
+-- 7) Display names of employees who contacted Toll Brothers
+SELECT e.FirstName, e.LastName
+FROM Employee e
+JOIN ContactEmployee ce ON e.EmployeeID = ce.EmployeeID
+JOIN Contact c ON ce.ContactID = c.ContactID
+JOIN Company co ON c.CompanyID = co.CompanyID
+WHERE co.CompanyName = 'Toll Brothers';
+
+-- 8) Significance of % and _ in LIKE statement
+-- %: Represents zero, one, or multiple characters.
+-- Example: SELECT * FROM Employee WHERE FirstName LIKE 'J%';
+-- _ : Represents exactly one character.
+-- Example: SELECT * FROM Employee WHERE FirstName LIKE 'J_n';
+
+-- 9) Normalization Explanation
+-- Normalization is the process of organizing data in a database to reduce redundancy,
+-- improve data integrity, and optimize performance.
+-- 1NF: Ensures atomic values.
+-- 2NF: Removes partial dependencies.
+-- 3NF: Removes transitive dependencies.
+
+-- 10) Explanation of JOIN in MySQL
+-- A JOIN combines rows from two or more tables based on a related column.
+-- Example: SELECT e.FirstName, c.CompanyName FROM Employee e
+--          JOIN ContactEmployee ce ON e.EmployeeID = ce.EmployeeID
+--          JOIN Contact c ON ce.ContactID = c.ContactID;
+
+-- 11) Explanation of DDL, DCL, and DML
+-- DDL: Data Definition Language (CREATE, ALTER, DROP).
+-- DML: Data Manipulation Language (INSERT, UPDATE, DELETE, SELECT).
+-- DCL: Data Control Language (GRANT, REVOKE).
+
+-- 12) MySQL JOIN Clause and Types
+-- Role: JOIN combines data from multiple tables.
+-- Types: 
+-- 1. INNER JOIN: Returns rows with matching values in both tables.
+-- 2. LEFT JOIN: Returns all rows from the left table, NULL for no match.
+-- 3. RIGHT JOIN: Returns all rows from the right table, NULL for no match.
+-- 4. FULL JOIN: Returns all rows when there is a match in either table.
